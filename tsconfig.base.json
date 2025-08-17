@@ -1,0 +1,52 @@
+{
+  "compilerOptions": {
+    "target": "ES2021",
+    "lib": ["ES2021", "DOM", "DOM.Iterable"],
+    "module": "esnext",
+    "skipLibCheck": true,
+    "allowJs": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "allowImportingTsExtensions": false,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": false,
+    "jsx": "preserve",
+    "incremental": true,
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@agentfactory/types": ["./packages/types/src"],
+      "@agentfactory/types/*": ["packages/types/src/*"],
+      "@agentfactory/compiler": ["./packages/compiler/src"],
+      "@agentfactory/compiler/*": ["packages/compiler/src/*"],
+      "@agentfactory/api": ["./packages/api/src"],
+      "@agentfactory/api/*": ["packages/api/src/*"],
+      "@agentfactory/adapters": ["./packages/adapters/src"],
+      "@agentfactory/adapters/*": ["packages/adapters/src/*"],
+      "@agentfactory/sdk": ["./packages/sdk/src"],
+      "@agentfactory/sdk/*": ["packages/sdk/src/*"],
+      "@agentfactory/web": ["./packages/web/src"],
+      "@agentfactory/web/*": ["packages/web/src/*"]
+    }
+  },
+  "exclude": ["node_modules", "**/dist", "**/build", "**/.next"],
+  "references": [
+    { "path": "./packages/types" },
+    { "path": "./packages/compiler" },
+    { "path": "./packages/adapters" },
+    { "path": "./packages/sdk" },
+    { "path": "./packages/api" },
+    { "path": "./packages/web" }
+  ]
+}
