@@ -1,185 +1,21 @@
-# AgentFactory
+# AgentFactory Visual Builder
 
-A modern monorepo for building, compiling, and deploying AI agents with visual workflow management.
+A modern visual agent blueprint creator with drag-and-drop workflow management. Build, visualize, and export multi-agent systems with an intuitive node-based interface.
+
+## 🌐 Live Demo
+
+**[View Live Demo](https://ndsweeney.github.io/agentvisualiser/)**
 
 ## 🚀 Features
 
 - **Visual Agent Builder**: Drag-and-drop interface for creating agent workflows
-- **Blueprint Management**: Create, edit, and delete agent blueprints with full CRUD operations
-- **Graph Compilation**: Validate and compile agent graphs with comprehensive error checking
-- **Deployment Pipeline**: Deploy compiled agents with release management
-- **Type-Safe Development**: Full TypeScript support across all packages
-- **Monorepo Architecture**: Organized workspace with shared dependencies
-- **GitHub Pages Ready**: Deploy as a static site with automatic CI/CD
+- **Blueprint Management**: Create, edit, and manage agent blueprints locally
+- **Real-time Validation**: Instant feedback on your agent configurations
+- **Export Options**: Save as PNG, JPG, or JSON
+- **Built-in Examples**: Sample blueprints to get you started
+- **No Backend Required**: Works completely in your browser with localStorage
 
-## 🌐 Live Demo
-
-**[View Live Demo on GitHub Pages](https://YOUR_USERNAME.github.io/YOUR_REPO_NAME/)**
-
-> Update the URL above after deploying to GitHub Pages
-
-## 📦 Package Structure
-
-```
-packages/
-├── api/          # NestJS REST API server
-├── web/          # Next.js frontend application  
-├── compiler/     # Agent graph compiler and validator
-├── types/        # Shared TypeScript types and Zod schemas
-├── sdk/          # Client SDK and CLI tools
-└── adapters/     # External service adapters
-```
-
-## 🛠️ Quick Start
-
-### Prerequisites
-- Node.js 18+ 
-- npm or yarn
-
-### Installation
-
-```bash
-# Clone the repository
-git clone <your-repo-url>
-cd AgentFactorySonnet
-
-# Install dependencies
-npm install
-
-# Build all packages
-npm run build
-```
-
-### Development
-
-Start both servers for development:
-
-```bash
-# Terminal 1: Start API server (port 3001)
-npm run start --workspace=@agentfactory/api
-
-# Terminal 2: Start web server (port 3000)  
-npm run start --workspace=@agentfactory/web
-```
-
-Or for the web app only (static mode):
-
-```bash
-npm run dev:web
-```
-
-### Access Points
-
-- **Web Application**: http://localhost:3000
-- **API Server**: http://localhost:3001
-- **API Documentation**: http://localhost:3001/docs
-
-## 🚀 Deployment to GitHub Pages
-
-### Automatic Deployment (Recommended)
-
-This repository is configured for automatic deployment to GitHub Pages when you push to the `main` branch.
-
-**Setup Steps:**
-
-1. **Enable GitHub Pages in Repository Settings:**
-   - Go to your repository on GitHub
-   - Navigate to `Settings` → `Pages`
-   - Under "Build and deployment", select:
-     - **Source**: GitHub Actions
-   - Click Save
-
-2. **Configure Base Path (if using repository subdirectory):**
-   
-   If your GitHub Pages URL is `https://username.github.io/repo-name/`, update `packages/web/next.config.js`:
-   
-   ```javascript
-   const nextConfig = {
-     // ...existing config...
-     basePath: '/your-repo-name',
-     assetPrefix: '/your-repo-name/',
-   }
-   ```
-
-3. **Push to Main Branch:**
-   ```bash
-   git add .
-   git commit -m "Deploy to GitHub Pages"
-   git push origin main
-   ```
-
-4. **Wait for Deployment:**
-   - Go to the `Actions` tab in your GitHub repository
-   - Watch the deployment workflow complete
-   - Your site will be live at `https://YOUR_USERNAME.github.io/YOUR_REPO_NAME/`
-
-### Manual Deployment
-
-Build and test locally before deploying:
-
-```bash
-# Build the static site
-npm run build:gh-pages
-
-# The static files will be in packages/web/out/
-# You can test them locally with a static server:
-npx serve packages/web/out
-```
-
-## 🏗️ Development Commands
-
-```bash
-# Build all packages
-npm run build
-
-# Build for GitHub Pages
-npm run build:gh-pages
-
-# Run tests
-npm test
-
-# Lint code
-npm run lint
-
-# Type check
-npm run typecheck
-
-# Clean build artifacts
-npm run clean
-
-# Format code
-npm run format
-```
-
-## 📚 API Endpoints
-
-### Blueprints
-- `GET /blueprints` - List all blueprints
-- `POST /blueprints` - Create new blueprint
-- `GET /blueprints/:id` - Get blueprint by ID
-- `PUT /blueprints/:id` - Update blueprint
-- `DELETE /blueprints/:id` - Delete blueprint ✨
-- `POST /blueprints/:id/materialize` - Materialize blueprint
-
-### Compilation & Deployment
-- `POST /compile` - Compile agent graph
-- `GET /compiled` - List compiled projects
-- `POST /compiled` - Create compiled project
-- `DELETE /compiled/:id` - Delete compiled project
-- `POST /deploy` - Deploy agent
-- `GET /deploy` - List deployments
-- `DELETE /deploy/:releaseId` - Delete deployment
-
-## 🔧 Architecture
-
-- **Frontend**: Next.js with TypeScript, Tailwind CSS, React Flow
-- **Backend**: NestJS with Express, OpenAPI documentation
-- **Storage**: Browser localStorage (client-side), File-based JSON (API server)
-- **Validation**: Zod schemas with TypeScript integration
-- **Build System**: TypeScript with composite projects
-- **Deployment**: Static export for GitHub Pages
-
-## ✨ Features
+## ✨ What You Can Do
 
 ### Visual Blueprint Creator
 - 🎨 Drag-and-drop node-based interface
@@ -197,42 +33,85 @@ npm run format
 - Helpdesk Automation
 - Maker-Checker Pattern
 
-### Data Storage
+## 🛠️ Local Development
+
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/ndsweeney/agentvisualiser.git
+cd agentvisualiser
+
+# Install dependencies
+npm install
+
+# Build the types package
+npm run build --workspace=@agentfactory/types
+
+# Start development server
+npm run dev:web
+```
+
+Visit `http://localhost:3000`
+
+### Build for Production
+
+```bash
+# Build static site
+npm run build:gh-pages
+
+# Test locally
+npx serve packages/web/out
+```
+
+## 📦 Project Structure
+
+```
+packages/
+├── web/          # Next.js frontend application  
+└── types/        # Shared TypeScript types and Zod schemas
+```
+
+## 💾 Data Storage
+
 All blueprints are stored in your browser's localStorage:
-- ✅ No server required for the web app
+- ✅ No server required
 - ✅ Works completely offline after initial load
 - ✅ Fast and instant saves
 - ⚠️ Data is browser/device specific
 - ⚠️ Export JSON to backup your blueprints
 
-## 🚀 Recent Updates
+## 🚀 Deployment
 
-- ✅ Fixed TypeScript compilation across all packages
-- ✅ Resolved ES/CommonJS module compatibility issues  
-- ✅ Implemented complete blueprint CRUD operations
-- ✅ Added working delete functionality for blueprints
-- ✅ Configured for GitHub Pages deployment
-- ✅ Added automatic CI/CD with GitHub Actions
-- ✅ Both API and web servers running successfully
+This project is configured for automatic deployment to GitHub Pages.
+
+When you push to the `main` branch:
+1. GitHub Actions automatically builds the static site
+2. Deploys to GitHub Pages
+3. Your site is live at `https://ndsweeney.github.io/agentvisualiser/`
+
+## 🎯 Technology Stack
+
+- **Frontend**: Next.js 14 with TypeScript
+- **UI**: React Flow, Tailwind CSS, Radix UI
+- **Validation**: Zod schemas
+- **Storage**: Browser localStorage
+- **Deployment**: GitHub Pages with GitHub Actions
 
 ## 📝 License
 
-MIT License - see LICENSE file for details
+MIT License
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📞 Support
-
-For support and questions, please open an issue in the GitHub repository.
+Contributions are welcome! Feel free to open issues or submit pull requests.
 
 ## 🔗 Links
 
+- [Live Demo](https://ndsweeney.github.io/agentvisualiser/)
+- [GitHub Repository](https://github.com/ndsweeney/agentvisualiser)
 - [Documentation](./GITHUB_PAGES_DEPLOYMENT.md)
-- [Integration Guide](./INTEGRATION_QUICKSTART.md)
-- [Report Flow](./REPORT_INGESTION_FLOW.md)

@@ -13,9 +13,9 @@ const nextConfig = {
     config.resolve.extensions.push('.ts', '.tsx');
     return config;
   },
-  // Uncomment these lines if deploying to GitHub Pages with a repository name
-  // basePath: '/your-repo-name',
-  // assetPrefix: '/your-repo-name/',
+  // Configure for GitHub Pages deployment at https://ndsweeney.github.io/agentvisualiser/
+  basePath: '/agentvisualiser',
+  assetPrefix: '/agentvisualiser/',
 }
 
 module.exports = nextConfig
