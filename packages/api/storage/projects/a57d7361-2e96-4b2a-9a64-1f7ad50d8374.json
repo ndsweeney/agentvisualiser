@@ -1,0 +1,144 @@
+{
+  "id": "a57d7361-2e96-4b2a-9a64-1f7ad50d8374",
+  "name": "Approval Chain 22",
+  "description": "Sequential approval workflow with escalation",
+  "category": "Custom",
+  "tags": [],
+  "template": {
+    "id": "approval-chain-22",
+    "name": "Approval Chain 22",
+    "version": "1.0.0",
+    "description": "Sequential approval workflow with escalation",
+    "orchestration": {
+      "id": "approval-chain-22-orchestration",
+      "name": "Approval Chain 22 Orchestration",
+      "agents": [
+        {
+          "id": "requestor",
+          "name": "Request Agent",
+          "prompt": "Process and validate the initial request",
+          "tools": [
+            "validation-tool"
+          ],
+          "memory": {
+            "type": "ephemeral",
+            "maxTokens": 4000
+          },
+          "policies": {
+            "maxIterations": 10,
+            "timeout": 30000,
+            "retryPolicy": "exponential"
+          }
+        },
+        {
+          "id": "supervisor",
+          "name": "Supervisor Agent",
+          "prompt": "Review and approve/reject supervisor-level requests",
+          "tools": [
+            "approval-tool"
+          ],
+          "memory": {
+            "type": "ephemeral",
+            "maxTokens": 4000
+          },
+          "policies": {
+            "maxIterations": 10,
+            "timeout": 30000,
+            "retryPolicy": "exponential"
+          }
+        },
+        {
+          "id": "manager",
+          "name": "Manager Agent",
+          "prompt": "Final approval for high-value requests",
+          "tools": [
+            "approval-tool",
+            "notification-tool"
+          ],
+          "memory": {
+            "type": "ephemeral",
+            "maxTokens": 4000
+          },
+          "policies": {
+            "maxIterations": 10,
+            "timeout": 30000,
+            "retryPolicy": "exponential"
+          }
+        }
+      ],
+      "tools": [
+        {
+          "id": "validation-tool",
+          "name": "Validation",
+          "kind": "rest",
+          "config": {
+            "endpoint": ""
+          },
+          "auth": {
+            "type": "none",
+            "credentials": {}
+          }
+        },
+        {
+          "id": "approval-tool",
+          "name": "Approval",
+          "kind": "rest",
+          "config": {
+            "endpoint": ""
+          },
+          "auth": {
+            "type": "none",
+            "credentials": {}
+          }
+        },
+        {
+          "id": "notification-tool",
+          "name": "Notifications",
+          "kind": "rest",
+          "config": {
+            "endpoint": ""
+          },
+          "auth": {
+            "type": "none",
+            "credentials": {}
+          }
+        }
+      ],
+      "gates": [
+        {
+          "id": "amount-gate",
+          "type": "condition",
+          "condition": "amount > 1000"
+        }
+      ],
+      "edges": [
+        {
+          "id": "e1",
+          "source": "requestor",
+          "target": "supervisor"
+        },
+        {
+          "id": "e2",
+          "source": "supervisor",
+          "target": "amount-gate"
+        },
+        {
+          "id": "e3",
+          "source": "amount-gate",
+          "target": "manager"
+        }
+      ],
+      "startNode": "requestor",
+      "outputs": [
+        "supervisor",
+        "manager"
+      ]
+    },
+    "metadata": {
+      "createdAt": "2025-08-18T09:31:45.795Z",
+      "updatedAt": "2025-08-18T09:31:45.795Z",
+      "author": "Visual Designer",
+      "tags": []
+    }
+  }
+}

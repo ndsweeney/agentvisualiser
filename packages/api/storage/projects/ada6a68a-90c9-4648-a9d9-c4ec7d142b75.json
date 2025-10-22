@@ -1,0 +1,149 @@
+{
+  "id": "ada6a68a-90c9-4648-a9d9-c4ec7d142b75",
+  "name": "test",
+  "description": "",
+  "category": "Automation",
+  "tags": [],
+  "template": {
+    "id": "test",
+    "name": "test",
+    "version": "1.0.0",
+    "description": "",
+    "orchestration": {
+      "id": "test-orchestration",
+      "name": "test Orchestration",
+      "agents": [
+        {
+          "id": "agent-1759425257684",
+          "name": "Processor Agent",
+          "prompt": "You are a processor agent. Process tasks according to your role.",
+          "tools": [],
+          "memory": {
+            "type": "ephemeral",
+            "maxTokens": 4000
+          },
+          "policies": {
+            "maxIterations": 10,
+            "timeout": 30000,
+            "retryPolicy": "exponential"
+          }
+        },
+        {
+          "id": "agent-1759425306317",
+          "name": "wow",
+          "prompt": "You are a router agent. Process tasks according to your role.",
+          "tools": [],
+          "memory": {
+            "type": "ephemeral",
+            "maxTokens": 4000
+          },
+          "policies": {
+            "maxIterations": 10,
+            "timeout": 30000,
+            "retryPolicy": "exponential"
+          }
+        },
+        {
+          "id": "agent-1759425313188",
+          "name": "Output to teams",
+          "prompt": "You are a analyzer agent. Process tasks according to your role.",
+          "tools": [],
+          "memory": {
+            "type": "ephemeral",
+            "maxTokens": 4000
+          },
+          "policies": {
+            "maxIterations": 10,
+            "timeout": 30000,
+            "retryPolicy": "exponential"
+          }
+        }
+      ],
+      "tools": [
+        {
+          "id": "tool-1759425429382",
+          "name": "REST API Tool",
+          "kind": "rest",
+          "config": {
+            "endpoint": ""
+          },
+          "auth": {
+            "type": "none",
+            "credentials": {}
+          }
+        },
+        {
+          "id": "tool-1759425461121",
+          "name": "ServiceNow Tool",
+          "kind": "servicenow",
+          "config": {
+            "endpoint": ""
+          },
+          "auth": {
+            "type": "none",
+            "credentials": {}
+          }
+        }
+      ],
+      "gates": [
+        {
+          "id": "gate-1759425530444",
+          "type": "condition",
+          "condition": "value > threshold"
+        }
+      ],
+      "edges": [
+        {
+          "id": "xy-edge__agent-1759425306317-agent-1759425257684",
+          "source": "agent-1759425306317",
+          "target": "agent-1759425257684"
+        },
+        {
+          "id": "xy-edge__agent-1759425257684-agent-1759425313188",
+          "source": "agent-1759425257684",
+          "target": "agent-1759425313188"
+        },
+        {
+          "id": "xy-edge__agent-1759425257684-tool-1759425429382",
+          "source": "agent-1759425257684",
+          "target": "tool-1759425429382"
+        },
+        {
+          "id": "xy-edge__tool-1759425429382-agent-1759425257684",
+          "source": "tool-1759425429382",
+          "target": "agent-1759425257684"
+        },
+        {
+          "id": "xy-edge__tool-1759425429382-tool-1759425461121",
+          "source": "tool-1759425429382",
+          "target": "tool-1759425461121"
+        },
+        {
+          "id": "xy-edge__tool-1759425461121-agent-1759425313188",
+          "source": "tool-1759425461121",
+          "target": "agent-1759425313188"
+        },
+        {
+          "id": "xy-edge__agent-1759425257684-gate-1759425530444",
+          "source": "agent-1759425257684",
+          "target": "gate-1759425530444"
+        },
+        {
+          "id": "xy-edge__gate-1759425530444-agent-1759425313188",
+          "source": "gate-1759425530444",
+          "target": "agent-1759425313188"
+        }
+      ],
+      "startNode": "agent-1759425306317",
+      "outputs": [
+        "agent-1759425313188"
+      ]
+    },
+    "metadata": {
+      "createdAt": "2025-10-02T17:20:02.561Z",
+      "updatedAt": "2025-10-13T17:02:00.082Z",
+      "author": "Visual Designer",
+      "tags": []
+    }
+  }
+}

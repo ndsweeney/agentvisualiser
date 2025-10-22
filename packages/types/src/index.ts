@@ -96,6 +96,7 @@ export interface ProjectSpec {
     updatedAt: string;
     author?: string;
     tags?: string[];
+    nodePositions?: Record<string, { x: number; y: number }>;
   };
 }
 

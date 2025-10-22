@@ -18,7 +18,9 @@
     "start:web": "npm run start --workspace=@agentfactory/web",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "ci": "npm run lint && npm run typecheck && npm run test && npm run build"
+    "ci": "npm run lint && npm run typecheck && npm run test && npm run build",
+    "deploy:gh-pages": "npm run build --workspace=@agentfactory/types && npm run deploy --workspace=@agentfactory/web",
+    "build:gh-pages": "npm run build --workspace=@agentfactory/types && npm run build --workspace=@agentfactory/web"
   },
   "keywords": [
     "agents",

@@ -8,7 +8,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "export": "next build",
+    "deploy": "next build && touch out/.nojekyll"
   },
   "dependencies": {
     "@agentfactory/sdk": "*",
@@ -24,6 +26,7 @@
     "framer-motion": "^10.16.0",
     "html-to-image": "^1.11.13",
     "lucide-react": "^0.300.0",
+    "modern-screenshot": "^4.6.6",
     "next": "14.2.31",
     "react": "^18",
     "react-colorful": "^5.6.1",

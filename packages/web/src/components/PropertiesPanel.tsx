@@ -1,26 +1,85 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Node } from '@xyflow/react';
 import { NodeData } from './VisualNodes';
 
 interface PropertiesPanelProps {
   selectedNode: { id: string; data: NodeData } | null;
+  selectedEdge: { id: string; source: string; target: string; label?: string; data?: { name?: string; description?: string } } | null;
+  nodes: Node[]; // Add nodes array so we can look up names
   onUpdateNode: (nodeId: string, newData: Partial<NodeData>) => void;
+  onUpdateEdge: (edgeId: string, newData: { label?: string; data?: { name?: string; description?: string } }) => void;
+  onDeleteNode?: (nodeId: string) => void;
+  onDeleteEdge?: (edgeId: string) => void;
   onClose: () => void;
 }
 
 export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   selectedNode,
+  selectedEdge,
+  nodes,
   onUpdateNode,
+  onUpdateEdge,
+  onDeleteNode,
+  onDeleteEdge,
   onClose
 }) => {
   const [formData, setFormData] = useState<NodeData>(
     selectedNode?.data || { name: '', type: 'agent' }
   );
+  
+  const [edgeLabel, setEdgeLabel] = useState(selectedEdge?.label || '');
+  const [edgeName, setEdgeName] = useState(selectedEdge?.data?.name || '');
+  const [edgeDescription, setEdgeDescription] = useState(selectedEdge?.data?.description || '');
 
-  if (!selectedNode) return null;
+  // Update formData when selectedNode changes
+  useEffect(() => {
+    if (selectedNode) {
+      setFormData(selectedNode.data);
+    }
+  }, [selectedNode]);
+
+  // Update edge data when selectedEdge changes
+  useEffect(() => {
+    if (selectedEdge) {
+      setEdgeLabel(selectedEdge.label || '');
+      setEdgeName(selectedEdge.data?.name || '');
+      setEdgeDescription(selectedEdge.data?.description || '');
+    }
+  }, [selectedEdge]);
+
+  if (!selectedNode && !selectedEdge) return null;
 
   const handleSave = () => {
-    onUpdateNode(selectedNode.id, formData);
+    if (selectedNode) {
+      onUpdateNode(selectedNode.id, formData);
+    } else if (selectedEdge) {
+      onUpdateEdge(selectedEdge.id, { 
+        label: edgeLabel,
+        data: {
+          name: edgeName,
+          description: edgeDescription
+        }
+      });
+    }
     onClose();
+  };
+
+  const handleDeleteNode = () => {
+    if (selectedNode && onDeleteNode) {
+      if (confirm(`Are you sure you want to delete "${formData.name}"?`)) {
+        onDeleteNode(selectedNode.id);
+        onClose();
+      }
+    }
+  };
+
+  const handleDeleteEdge = () => {
+    if (selectedEdge && onDeleteEdge) {
+      if (confirm('Are you sure you want to delete this connection?')) {
+        onDeleteEdge(selectedEdge.id);
+        onClose();
+      }
+    }
   };
 
   const renderAgentProperties = () => (
@@ -156,12 +215,85 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
     </div>
   );
 
+  const renderEdgeProperties = () => {
+    // Look up the node names from the nodes array
+    const sourceNode = nodes.find(n => n.id === selectedEdge?.source);
+    const targetNode = nodes.find(n => n.id === selectedEdge?.target);
+    const sourceName = (sourceNode?.data as unknown as NodeData)?.name || 'Unknown';
+    const targetName = (targetNode?.data as unknown as NodeData)?.name || 'Unknown';
+
+    return (
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Edge Name</label>
+          <input
+            type="text"
+            value={edgeName}
+            onChange={(e) => setEdgeName(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter edge name"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Edge Description</label>
+          <textarea
+            value={edgeDescription}
+            onChange={(e) => setEdgeDescription(e.target.value)}
+            rows={3}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter edge description"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Condition / Label
+          </label>
+          <input
+            type="text"
+            value={edgeLabel}
+            onChange={(e) => setEdgeLabel(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="e.g., if approved, amount > 1000"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Add a condition or label to describe when this connection is used
+          </p>
+        </div>
+
+        <div className="bg-yellow-50 p-3 rounded-md">
+          <div className="text-xs font-medium text-yellow-800 mb-1">💡 Tip</div>
+          <p className="text-xs text-yellow-700">
+            Use conditions like "approved", "amount {'>'} 1000", or "status == active" to control workflow logic
+          </p>
+        </div>
+
+        <div className="bg-blue-50 p-3 rounded-md">
+          <div className="text-xs text-gray-600 mb-1">Connection</div>
+          <div className="text-sm font-medium text-gray-900">
+            {selectedEdge?.source} → {selectedEdge?.target}
+          </div>
+        </div>
+
+        <div className="bg-green-50 p-3 rounded-md">
+          <div className="text-xs text-gray-600 mb-1">Node Names</div>
+          <div className="text-sm font-medium text-gray-900">
+            {sourceName} → {targetName}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="fixed right-0 top-0 h-full w-80 bg-white shadow-xl border-l z-50 overflow-y-auto">
       <div className="p-4 border-b bg-gray-50">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-900">
-            {formData.type === 'agent' ? '🤖' : formData.type === 'tool' ? '🛠️' : '🚪'} Properties
+            {selectedEdge ? '🔗 Connecting Line' : 
+             formData.type === 'agent' ? '🤖 Agent' : 
+             formData.type === 'tool' ? '🛠️ Tool' : '🚪 Gate'} Properties
           </h3>
           <button
             onClick={onClose}
@@ -173,9 +305,10 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
       </div>
 
       <div className="p-4">
-        {formData.type === 'agent' && renderAgentProperties()}
-        {formData.type === 'tool' && renderToolProperties()}
-        {formData.type === 'gate' && renderGateProperties()}
+        {selectedEdge && renderEdgeProperties()}
+        {selectedNode && formData.type === 'agent' && renderAgentProperties()}
+        {selectedNode && formData.type === 'tool' && renderToolProperties()}
+        {selectedNode && formData.type === 'gate' && renderGateProperties()}
 
         <div className="flex space-x-2 mt-6 pt-4 border-t">
           <button
@@ -190,6 +323,24 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           >
             Save
           </button>
+          {selectedNode && onDeleteNode && (
+            <button
+              onClick={handleDeleteNode}
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+              title="Delete this node"
+            >
+              🗑️
+            </button>
+          )}
+          {selectedEdge && onDeleteEdge && (
+            <button
+              onClick={handleDeleteEdge}
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+              title="Delete this connection"
+            >
+              🗑️
+            </button>
+          )}
         </div>
       </div>
     </div>

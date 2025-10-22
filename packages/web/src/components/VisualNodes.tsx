@@ -20,11 +20,29 @@ export interface NodeData {
 
 export const AgentNode = ({ data, isConnectable }: { data: NodeData; isConnectable: boolean }) => (
   <div className="px-4 py-3 shadow-lg rounded-lg bg-white border-2 border-blue-200 min-w-[160px] hover:border-blue-400 transition-colors">
+    {/* Top Handle */}
     <Handle 
       type="target" 
       position={Position.Top} 
       isConnectable={isConnectable}
       className="w-3 h-3 bg-blue-500 border-2 border-white"
+      id="top"
+    />
+    {/* Left Handle */}
+    <Handle 
+      type="target" 
+      position={Position.Left} 
+      isConnectable={isConnectable}
+      className="w-3 h-3 bg-blue-500 border-2 border-white"
+      id="left"
+    />
+    {/* Right Handle */}
+    <Handle 
+      type="source" 
+      position={Position.Right} 
+      isConnectable={isConnectable}
+      className="w-3 h-3 bg-blue-500 border-2 border-white"
+      id="right"
     />
     <div className="flex items-center">
       <div className="w-4 h-4 bg-blue-500 rounded-full mr-2 flex items-center justify-center">
@@ -48,22 +66,42 @@ export const AgentNode = ({ data, isConnectable }: { data: NodeData; isConnectab
         END
       </div>
     )}
+    {/* Bottom Handle */}
     <Handle 
       type="source" 
       position={Position.Bottom} 
       isConnectable={isConnectable}
       className="w-3 h-3 bg-blue-500 border-2 border-white"
+      id="bottom"
     />
   </div>
 );
 
 export const ToolNode = ({ data, isConnectable }: { data: NodeData; isConnectable: boolean }) => (
   <div className="px-4 py-3 shadow-lg rounded-lg bg-white border-2 border-green-200 min-w-[140px] hover:border-green-400 transition-colors">
+    {/* Top Handle */}
     <Handle 
       type="target" 
       position={Position.Top} 
       isConnectable={isConnectable}
       className="w-3 h-3 bg-green-500 border-2 border-white"
+      id="top"
+    />
+    {/* Left Handle */}
+    <Handle 
+      type="target" 
+      position={Position.Left} 
+      isConnectable={isConnectable}
+      className="w-3 h-3 bg-green-500 border-2 border-white"
+      id="left"
+    />
+    {/* Right Handle */}
+    <Handle 
+      type="source" 
+      position={Position.Right} 
+      isConnectable={isConnectable}
+      className="w-3 h-3 bg-green-500 border-2 border-white"
+      id="right"
     />
     <div className="flex items-center">
       <div className="w-4 h-4 bg-green-500 rounded-full mr-2 flex items-center justify-center">
@@ -77,22 +115,42 @@ export const ToolNode = ({ data, isConnectable }: { data: NodeData; isConnectabl
         )}
       </div>
     </div>
+    {/* Bottom Handle */}
     <Handle 
       type="source" 
       position={Position.Bottom} 
       isConnectable={isConnectable}
       className="w-3 h-3 bg-green-500 border-2 border-white"
+      id="bottom"
     />
   </div>
 );
 
 export const GateNode = ({ data, isConnectable }: { data: NodeData; isConnectable: boolean }) => (
   <div className="px-4 py-3 shadow-lg rounded-lg bg-white border-2 border-purple-200 min-w-[120px] hover:border-purple-400 transition-colors">
+    {/* Top Handle */}
     <Handle 
       type="target" 
       position={Position.Top} 
       isConnectable={isConnectable}
       className="w-3 h-3 bg-purple-500 border-2 border-white"
+      id="top"
+    />
+    {/* Left Handle */}
+    <Handle 
+      type="target" 
+      position={Position.Left} 
+      isConnectable={isConnectable}
+      className="w-3 h-3 bg-purple-500 border-2 border-white"
+      id="left"
+    />
+    {/* Right Handle */}
+    <Handle 
+      type="source" 
+      position={Position.Right} 
+      isConnectable={isConnectable}
+      className="w-3 h-3 bg-purple-500 border-2 border-white"
+      id="right"
     />
     <div className="flex items-center">
       <div className="w-4 h-4 bg-purple-500 rounded-full mr-2 flex items-center justify-center">
@@ -108,11 +166,13 @@ export const GateNode = ({ data, isConnectable }: { data: NodeData; isConnectabl
         )}
       </div>
     </div>
+    {/* Bottom Handle */}
     <Handle 
       type="source" 
       position={Position.Bottom} 
       isConnectable={isConnectable}
       className="w-3 h-3 bg-purple-500 border-2 border-white"
+      id="bottom"
     />
   </div>
 );

@@ -1,0 +1,125 @@
+{
+  "id": "910856ec-b2a0-453e-bb48-a8ad068a3063",
+  "name": "test 8-18",
+  "description": "",
+  "category": "Custom",
+  "tags": [],
+  "template": {
+    "id": "test-8-18",
+    "name": "test 8-18",
+    "version": "1.0.0",
+    "description": "",
+    "orchestration": {
+      "id": "test-8-18-orchestration",
+      "name": "test 8-18 Orchestration",
+      "agents": [
+        {
+          "id": "agent-1755504465000",
+          "name": "Router Agent",
+          "prompt": "You are a router agent. Process tasks according to your role.",
+          "tools": [],
+          "memory": {
+            "type": "ephemeral",
+            "maxTokens": 4000
+          },
+          "policies": {
+            "maxIterations": 10,
+            "timeout": 30000,
+            "retryPolicy": "exponential"
+          }
+        },
+        {
+          "id": "agent-1755504469584",
+          "name": "Processor Agent",
+          "prompt": "You are a processor agent. Process tasks according to your role.",
+          "tools": [],
+          "memory": {
+            "type": "ephemeral",
+            "maxTokens": 4000
+          },
+          "policies": {
+            "maxIterations": 10,
+            "timeout": 30000,
+            "retryPolicy": "exponential"
+          }
+        },
+        {
+          "id": "agent-1755504480835",
+          "name": "Responder Agent",
+          "prompt": "You are a responder agent. Process tasks according to your role.",
+          "tools": [],
+          "memory": {
+            "type": "ephemeral",
+            "maxTokens": 4000
+          },
+          "policies": {
+            "maxIterations": 10,
+            "timeout": 30000,
+            "retryPolicy": "exponential"
+          }
+        }
+      ],
+      "tools": [
+        {
+          "id": "tool-1755504526436",
+          "name": "File System Tool",
+          "kind": "rest",
+          "config": {
+            "endpoint": ""
+          },
+          "auth": {
+            "type": "none",
+            "credentials": {}
+          }
+        }
+      ],
+      "gates": [
+        {
+          "id": "gate-1755504571615",
+          "type": "approval",
+          "condition": "true",
+          "approvers": [
+            "admin"
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "id": "xy-edge__agent-1755504465000-agent-1755504469584",
+          "source": "agent-1755504465000",
+          "target": "agent-1755504469584"
+        },
+        {
+          "id": "xy-edge__agent-1755504469584-agent-1755504480835",
+          "source": "agent-1755504469584",
+          "target": "agent-1755504480835"
+        },
+        {
+          "id": "xy-edge__agent-1755504465000-tool-1755504526436",
+          "source": "agent-1755504465000",
+          "target": "tool-1755504526436"
+        },
+        {
+          "id": "xy-edge__agent-1755504469584-gate-1755504571615",
+          "source": "agent-1755504469584",
+          "target": "gate-1755504571615"
+        },
+        {
+          "id": "xy-edge__gate-1755504571615-agent-1755504480835",
+          "source": "gate-1755504571615",
+          "target": "agent-1755504480835"
+        }
+      ],
+      "startNode": "agent-1755504465000",
+      "outputs": [
+        "agent-1755504480835"
+      ]
+    },
+    "metadata": {
+      "createdAt": "2025-08-18T08:10:32.033Z",
+      "updatedAt": "2025-08-18T08:10:32.034Z",
+      "author": "Visual Designer",
+      "tags": []
+    }
+  }
+}

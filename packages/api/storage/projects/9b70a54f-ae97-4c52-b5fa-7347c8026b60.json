@@ -1,0 +1,137 @@
+{
+  "id": "9b70a54f-ae97-4c52-b5fa-7347c8026b60",
+  "name": "1234",
+  "description": "",
+  "category": "Data",
+  "tags": [],
+  "template": {
+    "id": "1234",
+    "name": "1234",
+    "version": "1.0.0",
+    "description": "",
+    "orchestration": {
+      "id": "1234-orchestration",
+      "name": "1234 Orchestration",
+      "agents": [
+        {
+          "id": "agent-1761067418128",
+          "name": "Processor Agent",
+          "prompt": "You are a processor agent. Process tasks according to your role.",
+          "tools": [],
+          "memory": {
+            "type": "ephemeral",
+            "maxTokens": 4000
+          },
+          "policies": {
+            "maxIterations": 10,
+            "timeout": 30000,
+            "retryPolicy": "exponential"
+          }
+        },
+        {
+          "id": "agent-1761067420820",
+          "name": "Responder Agent",
+          "prompt": "You are a responder agent. Process tasks according to your role.",
+          "tools": [],
+          "memory": {
+            "type": "ephemeral",
+            "maxTokens": 4000
+          },
+          "policies": {
+            "maxIterations": 10,
+            "timeout": 30000,
+            "retryPolicy": "exponential"
+          }
+        },
+        {
+          "id": "agent-1761067422658",
+          "name": "Router Agent",
+          "prompt": "You are a router agent. Process tasks according to your role.",
+          "tools": [],
+          "memory": {
+            "type": "ephemeral",
+            "maxTokens": 4000
+          },
+          "policies": {
+            "maxIterations": 10,
+            "timeout": 30000,
+            "retryPolicy": "exponential"
+          }
+        }
+      ],
+      "tools": [
+        {
+          "id": "tool-1761067420069",
+          "name": "Database Tool",
+          "kind": "rest",
+          "config": {
+            "endpoint": ""
+          },
+          "auth": {
+            "type": "none",
+            "credentials": {}
+          }
+        }
+      ],
+      "gates": [],
+      "edges": [
+        {
+          "id": "xy-edge__agent-1761067422658bottom-agent-1761067420820top",
+          "source": "agent-1761067422658",
+          "target": "agent-1761067420820",
+          "sourceHandle": "bottom",
+          "targetHandle": "top"
+        },
+        {
+          "id": "xy-edge__agent-1761067420820bottom-agent-1761067418128top",
+          "source": "agent-1761067420820",
+          "target": "agent-1761067418128",
+          "sourceHandle": "bottom",
+          "targetHandle": "top"
+        },
+        {
+          "id": "xy-edge__agent-1761067420820right-tool-1761067420069left",
+          "source": "agent-1761067420820",
+          "target": "tool-1761067420069",
+          "sourceHandle": "right",
+          "targetHandle": "left"
+        },
+        {
+          "id": "xy-edge__tool-1761067420069bottom-agent-1761067418128top",
+          "source": "tool-1761067420069",
+          "target": "agent-1761067418128",
+          "sourceHandle": "bottom",
+          "targetHandle": "top"
+        }
+      ],
+      "startNode": "agent-1761067422658",
+      "outputs": [
+        "agent-1761067418128"
+      ]
+    },
+    "metadata": {
+      "createdAt": "2025-10-21T17:25:04.596Z",
+      "updatedAt": "2025-10-21T17:25:04.596Z",
+      "author": "Visual Designer",
+      "tags": [],
+      "nodePositions": {
+        "agent-1761067418128": {
+          "x": 128,
+          "y": 352
+        },
+        "tool-1761067420069": {
+          "x": 288,
+          "y": 176
+        },
+        "agent-1761067420820": {
+          "x": 0,
+          "y": 208
+        },
+        "agent-1761067422658": {
+          "x": -32,
+          "y": 48
+        }
+      }
+    }
+  }
+}

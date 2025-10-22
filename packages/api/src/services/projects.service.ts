@@ -3,164 +3,164 @@ import { promises as fs } from 'fs';
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { config } from '../config';
-import type { Blueprint } from '../types';
+import type { Blueprint as Project } from '../types';
 import type { ProjectSpec } from '@agentfactory/types';
 
 @Injectable()
 export class BlueprintsService {
   private readonly logger = new Logger(BlueprintsService.name);
-  private readonly blueprintsPath = join(config.storage.path, 'blueprints');
+  private readonly blueprintsPath = join(config.storage.path, 'projects');
 
-  async getBlueprints(): Promise<Blueprint[]> {
+  async getBlueprints(): Promise<Project[]> {
     try {
-      // Get built-in blueprints
-      const builtInBlueprints = await this.getBuiltInBlueprints();
+      // Get built-in projects
+      const builtInProjects = await this.getBuiltInBlueprints();
       
-      // Get custom blueprints from storage
-      const customBlueprints = await this.getCustomBlueprints();
+      // Get custom projects from storage
+      const customProjects = await this.getCustomBlueprints();
       
-      // Combine and return all blueprints
-      return [...builtInBlueprints, ...customBlueprints];
+      // Combine and return all projects
+      return [...builtInProjects, ...customProjects];
     } catch (error) {
-      this.logger.error('Failed to get blueprints', error);
-      // Return at least the built-in blueprints if storage fails
+      this.logger.error('Failed to get projects', error);
+      // Return at least the built-in projects if storage fails
       return await this.getBuiltInBlueprints();
     }
   }
 
-  async materializeBlueprint(blueprintId: string): Promise<ProjectSpec> {
-    const blueprints = await this.getBlueprints();
-    const blueprint = blueprints.find(b => b.id === blueprintId);
+  async materializeBlueprint(projectId: string): Promise<ProjectSpec> {
+    const projects = await this.getBlueprints();
+    const project = projects.find(b => b.id === projectId);
     
-    if (!blueprint) {
-      throw new Error(`Blueprint ${blueprintId} not found`);
+    if (!project) {
+      throw new Error(`Project ${projectId} not found`);
     }
 
-    this.logger.log(`Materializing blueprint: ${blueprint.name}`);
+    this.logger.log(`Materializing project: ${project.name}`);
     
-    // Handle both built-in blueprints (spec) and custom blueprints (template)
-    const projectSpec = (blueprint as any).spec || (blueprint as any).template;
+    // Handle both built-in projects (spec) and custom projects (template)
+    const projectSpec = (project as any).spec || (project as any).template;
     
     if (!projectSpec) {
-      throw new Error(`Blueprint ${blueprintId} has no valid project specification`);
+      throw new Error(`Project ${projectId} has no valid project specification`);
     }
     
     return projectSpec;
   }
 
-  async createBlueprint(blueprintData: Omit<Blueprint, 'id'>): Promise<Blueprint> {
-    this.logger.log(`Creating new blueprint: ${blueprintData.name}`);
+  async createBlueprint(projectData: Omit<Project, 'id'>): Promise<Project> {
+    this.logger.log(`Creating new project: ${projectData.name}`);
     
-    const blueprintId = uuidv4();
-    const blueprint: Blueprint = {
-      id: blueprintId,
-      ...blueprintData,
+    const projectId = uuidv4();
+    const project: Project = {
+      id: projectId,
+      ...projectData,
     };
     
     try {
-      // Ensure blueprints directory exists
+      // Ensure projects directory exists
       await fs.mkdir(this.blueprintsPath, { recursive: true });
       
-      const filePath = join(this.blueprintsPath, `${blueprintId}.json`);
-      await fs.writeFile(filePath, JSON.stringify(blueprint, null, 2));
+      const filePath = join(this.blueprintsPath, `${projectId}.json`);
+      await fs.writeFile(filePath, JSON.stringify(project, null, 2));
       
-      this.logger.log(`Successfully created blueprint ${blueprintId}`);
-      return blueprint;
+      this.logger.log(`Successfully created project ${projectId}`);
+      return project;
     } catch (error) {
-      this.logger.error(`Failed to create blueprint ${blueprintId}`, error);
+      this.logger.error(`Failed to create project ${projectId}`, error);
       throw error;
     }
   }
 
-  async updateBlueprint(blueprintId: string, blueprintData: Partial<Blueprint>): Promise<Blueprint> {
-    this.logger.log(`Updating blueprint: ${blueprintId}`);
+  async updateBlueprint(projectId: string, projectData: Partial<Project>): Promise<Project> {
+    this.logger.log(`Updating project: ${projectId}`);
     
     try {
-      const existingBlueprint = await this.getBlueprintById(blueprintId);
-      const updatedBlueprint: Blueprint = {
-        ...existingBlueprint,
-        ...blueprintData,
-        id: blueprintId, // Ensure ID doesn't change
+      const existingProject = await this.getBlueprintById(projectId);
+      const updatedProject: Project = {
+        ...existingProject,
+        ...projectData,
+        id: projectId, // Ensure ID doesn't change
       };
       
-      const filePath = join(this.blueprintsPath, `${blueprintId}.json`);
-      await fs.writeFile(filePath, JSON.stringify(updatedBlueprint, null, 2));
+      const filePath = join(this.blueprintsPath, `${projectId}.json`);
+      await fs.writeFile(filePath, JSON.stringify(updatedProject, null, 2));
       
-      this.logger.log(`Successfully updated blueprint ${blueprintId}`);
-      return updatedBlueprint;
+      this.logger.log(`Successfully updated project ${projectId}`);
+      return updatedProject;
     } catch (error) {
-      this.logger.error(`Failed to update blueprint ${blueprintId}`, error);
+      this.logger.error(`Failed to update project ${projectId}`, error);
       throw error;
     }
   }
 
-  async deleteBlueprint(blueprintId: string): Promise<void> {
-    this.logger.log(`Deleting blueprint: ${blueprintId}`);
+  async deleteBlueprint(projectId: string): Promise<void> {
+    this.logger.log(`Deleting project: ${projectId}`);
     
-    // Check if it's a built-in blueprint first
+    // Check if it's a built-in project first
     const builtInIds = ['multi-agent', 'approval-chain', 'data-pipeline'];
-    if (builtInIds.includes(blueprintId)) {
-      throw new Error('Built-in blueprints cannot be deleted');
+    if (builtInIds.includes(projectId)) {
+      throw new Error('Built-in projects cannot be deleted');
     }
     
     try {
-      const filePath = join(this.blueprintsPath, `${blueprintId}.json`);
+      const filePath = join(this.blueprintsPath, `${projectId}.json`);
       
       // Check if file exists before trying to delete
       await fs.access(filePath);
       
       await fs.unlink(filePath);
-      this.logger.log(`Successfully deleted blueprint ${blueprintId}`);
+      this.logger.log(`Successfully deleted project ${projectId}`);
     } catch (error: any) {
       if (error.code === 'ENOENT') {
-        this.logger.error(`Blueprint file not found: ${blueprintId}`);
-        throw new Error(`Blueprint ${blueprintId} not found`);
+        this.logger.error(`Project file not found: ${projectId}`);
+        throw new Error(`Project ${projectId} not found`);
       }
-      this.logger.error(`Failed to delete blueprint ${blueprintId}`, error);
-      throw new Error(`Failed to delete blueprint: ${error.message}`);
+      this.logger.error(`Failed to delete project ${projectId}`, error);
+      throw new Error(`Failed to delete project: ${error.message}`);
     }
   }
 
-  async getBlueprintById(blueprintId: string): Promise<Blueprint> {
+  async getBlueprintById(projectId: string): Promise<Project> {
     try {
-      const filePath = join(this.blueprintsPath, `${blueprintId}.json`);
+      const filePath = join(this.blueprintsPath, `${projectId}.json`);
       const data = await fs.readFile(filePath, 'utf-8');
       return JSON.parse(data);
     } catch (error) {
-      this.logger.error(`Failed to get blueprint ${blueprintId}`, error);
-      throw new Error(`Blueprint ${blueprintId} not found`);
+      this.logger.error(`Failed to get project ${projectId}`, error);
+      throw new Error(`Project ${projectId} not found`);
     }
   }
 
-  private async getCustomBlueprints(): Promise<Blueprint[]> {
+  private async getCustomBlueprints(): Promise<Project[]> {
     try {
-      // Ensure blueprints directory exists
+      // Ensure projects directory exists
       await fs.mkdir(this.blueprintsPath, { recursive: true });
       
       const files = await fs.readdir(this.blueprintsPath);
       const jsonFiles = files.filter(file => file.endsWith('.json'));
       
-      const blueprints = await Promise.all(
+      const projects = await Promise.all(
         jsonFiles.map(async (file) => {
           try {
             const filePath = join(this.blueprintsPath, file);
             const data = await fs.readFile(filePath, 'utf-8');
-            return JSON.parse(data) as Blueprint;
+            return JSON.parse(data) as Project;
           } catch (error) {
-            this.logger.warn(`Failed to read blueprint file ${file}`, error);
+            this.logger.warn(`Failed to read project file ${file}`, error);
             return null;
           }
         })
       );
       
-      return blueprints.filter(blueprint => blueprint !== null);
+      return projects.filter(project => project !== null);
     } catch (error) {
-      this.logger.error('Failed to get custom blueprints', error);
+      this.logger.error('Failed to get custom projects', error);
       return [];
     }
   }
 
-  private async getBuiltInBlueprints(): Promise<Blueprint[]> {
+  private async getBuiltInBlueprints(): Promise<Project[]> {
     return [
       {
         id: 'multi-agent',
