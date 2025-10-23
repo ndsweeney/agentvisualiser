@@ -13,9 +13,8 @@ const nextConfig = {
     config.resolve.extensions.push('.ts', '.tsx');
     return config;
   },
-  // Configure for GitHub Pages deployment at https://ndsweeney.github.io/agentvisualiser/
-  basePath: '/agentvisualiser',
-  assetPrefix: '/agentvisualiser/',
+  // Custom domain configuration: agentvisualiser.agentops.co.uk
+  // No base path needed for custom domain deployment
 }
 
 module.exports = nextConfig
