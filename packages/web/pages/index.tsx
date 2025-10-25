@@ -117,19 +117,19 @@ export default function Home() {
       <div className="h-screen flex flex-col bg-gray-100">
         {/* Blueprints Modal */}
         {showBlueprintsModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-              <div className="p-6 border-b flex justify-between items-center">
-                <h2 className="text-2xl font-bold text-gray-900">Example Agents</h2>
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-0 sm:p-4">
+            <div className="bg-white rounded-none sm:rounded-lg shadow-xl w-full h-full sm:w-full sm:max-w-6xl sm:h-auto sm:max-h-[90vh] overflow-hidden flex flex-col">
+              <div className="p-4 sm:p-6 border-b flex justify-between items-center">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Example Agents</h2>
                 <button
                   onClick={() => setShowBlueprintsModal(false)}
-                  className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
+                  className="text-gray-500 hover:text-gray-700 text-2xl leading-none min-w-[44px] min-h-[44px] flex items-center justify-center"
                 >
                   ×
                 </button>
               </div>
               
-              <div className="flex-1 overflow-y-auto p-6">
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6">
                 {blueprints.length === 0 ? (
                   <div className="text-center py-12">
                     <div className="text-gray-400 text-6xl mb-4">🎨</div>
@@ -139,13 +139,13 @@ export default function Home() {
                     </p>
                     <button
                       onClick={() => setShowBlueprintsModal(false)}
-                      className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors min-h-[44px]"
                     >
                       Start Creating
                     </button>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                     {blueprints.map((blueprint) => {
                       const getNodeCount = (bp: Blueprint) => {
                         if (bp.template?.orchestration?.agents) {
@@ -170,9 +170,9 @@ export default function Home() {
                       const isBuiltIn = ['multi-agent', 'approval-chain', 'data-pipeline', 'helpdesk-automation', 'maker-checker'].includes(blueprint.id);
 
                       return (
-                        <div key={blueprint.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow border">
+                        <div key={blueprint.id} className="bg-white rounded-lg shadow-md p-4 sm:p-6 hover:shadow-lg transition-shadow border">
                           <div className="flex items-start justify-between mb-3">
-                            <h3 className="text-xl font-semibold text-gray-900">{blueprint.name}</h3>
+                            <h3 className="text-lg sm:text-xl font-semibold text-gray-900">{blueprint.name}</h3>
                             {isBuiltIn && (
                               <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
                                 Built-in
@@ -198,7 +198,7 @@ export default function Home() {
                           <div className="space-y-2">
                             <button
                               onClick={() => handleEditBlueprint(blueprint)}
-                              className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                              className="w-full px-4 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors min-h-[44px]"
                               title={isBuiltIn ? "Copy example to canvas" : "Edit blueprint"}
                             >
                               ✏️ {isBuiltIn ? 'Copy to Canvas' : 'Edit Blueprint'}
@@ -207,7 +207,7 @@ export default function Home() {
                             {!isBuiltIn && (
                               <button
                                 onClick={() => handleDeleteBlueprint(blueprint.id)}
-                                className="w-full px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                                className="w-full px-4 py-3 bg-red-600 text-white rounded hover:bg-red-700 transition-colors min-h-[44px]"
                                 title="Delete blueprint"
                               >
                                 🗑️ Delete Blueprint

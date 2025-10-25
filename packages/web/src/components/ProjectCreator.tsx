@@ -73,17 +73,37 @@ const BlueprintCreatorInner: React.FC<BlueprintCreatorProps> = ({ onSave, onCanc
     gates: false
   });
   
+  // Mobile menu state
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  
+  // Workflow stats panel state - hidden on mobile by default
+  const [showWorkflowStats, setShowWorkflowStats] = useState(false);
+  
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { getViewport, getNodes, fitView } = useReactFlow();
   const router = useRouter();
 
-  // Toggle section expansion
+  // Toggle section expansion - only one section open at a time on mobile
   const toggleSection = (section: 'agents' | 'tools' | 'gates') => {
-    setSectionsExpanded(prev => ({
-      ...prev,
-      [section]: !prev[section]
-    }));
+    setSectionsExpanded(prev => {
+      // On mobile, close all other sections when opening a new one
+      const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+      
+      if (isMobile) {
+        return {
+          agents: section === 'agents' ? !prev.agents : false,
+          tools: section === 'tools' ? !prev.tools : false,
+          gates: section === 'gates' ? !prev.gates : false,
+        };
+      }
+      
+      // On desktop, allow independent toggling
+      return {
+        ...prev,
+        [section]: !prev[section]
+      };
+    });
   };
 
   const onConnect = useCallback(
@@ -134,10 +154,21 @@ const BlueprintCreatorInner: React.FC<BlueprintCreatorProps> = ({ onSave, onCanc
   }, [setNodes, setEdges]);
 
   const addAgentNode = useCallback((type: string) => {
+    const viewport = getViewport();
+    const reactFlowBounds = reactFlowWrapper.current?.getBoundingClientRect();
+    
+    // Calculate center of visible viewport
+    const centerX = reactFlowBounds ? (reactFlowBounds.width / 2 - viewport.x) / viewport.zoom : 250;
+    const centerY = reactFlowBounds ? (reactFlowBounds.height / 2 - viewport.y) / viewport.zoom : 150;
+    
+    // Add some randomness around center (smaller range for mobile)
+    const offsetX = (Math.random() - 0.5) * 200;
+    const offsetY = (Math.random() - 0.5) * 200;
+    
     const newNode: Node = {
       id: `agent-${Date.now()}`,
       type: 'agentNode',
-      position: { x: Math.random() * 400 + 100, y: Math.random() * 300 + 100 },
+      position: { x: centerX + offsetX, y: centerY + offsetY },
       data: {
         type: 'agent',
         name: `${type} Agent`,
@@ -147,13 +178,24 @@ const BlueprintCreatorInner: React.FC<BlueprintCreatorProps> = ({ onSave, onCanc
       } as unknown as Record<string, unknown>
     };
     setNodes((nds) => [...nds, newNode]);
-  }, [setNodes]);
+  }, [setNodes, getViewport]);
 
   const addToolNode = useCallback((toolType: string) => {
+    const viewport = getViewport();
+    const reactFlowBounds = reactFlowWrapper.current?.getBoundingClientRect();
+    
+    // Calculate center of visible viewport
+    const centerX = reactFlowBounds ? (reactFlowBounds.width / 2 - viewport.x) / viewport.zoom : 250;
+    const centerY = reactFlowBounds ? (reactFlowBounds.height / 2 - viewport.y) / viewport.zoom : 150;
+    
+    // Add some randomness around center
+    const offsetX = (Math.random() - 0.5) * 200;
+    const offsetY = (Math.random() - 0.5) * 200;
+    
     const newNode: Node = {
       id: `tool-${Date.now()}`,
       type: 'toolNode',
-      position: { x: Math.random() * 400 + 100, y: Math.random() * 300 + 100 },
+      position: { x: centerX + offsetX, y: centerY + offsetY },
       data: {
         type: 'tool',
         name: `${toolType} Tool`,
@@ -166,13 +208,24 @@ const BlueprintCreatorInner: React.FC<BlueprintCreatorProps> = ({ onSave, onCanc
       } as unknown as Record<string, unknown>
     };
     setNodes((nds) => [...nds, newNode]);
-  }, [setNodes]);
+  }, [setNodes, getViewport]);
 
   const addGateNode = useCallback((gateType: string) => {
+    const viewport = getViewport();
+    const reactFlowBounds = reactFlowWrapper.current?.getBoundingClientRect();
+    
+    // Calculate center of visible viewport
+    const centerX = reactFlowBounds ? (reactFlowBounds.width / 2 - viewport.x) / viewport.zoom : 250;
+    const centerY = reactFlowBounds ? (reactFlowBounds.height / 2 - viewport.y) / viewport.zoom : 150;
+    
+    // Add some randomness around center
+    const offsetX = (Math.random() - 0.5) * 200;
+    const offsetY = (Math.random() - 0.5) * 200;
+    
     const newNode: Node = {
       id: `gate-${Date.now()}`,
       type: 'gateNode',
-      position: { x: Math.random() * 400 + 100, y: Math.random() * 300 + 100 },
+      position: { x: centerX + offsetX, y: centerY + offsetY },
       data: {
         type: 'gate',
         name: `${gateType} Gate`,
@@ -181,7 +234,7 @@ const BlueprintCreatorInner: React.FC<BlueprintCreatorProps> = ({ onSave, onCanc
       } as unknown as Record<string, unknown>
     };
     setNodes((nds) => [...nds, newNode]);
-  }, [setNodes]);
+  }, [setNodes, getViewport]);
 
   const onUpdateNode = useCallback((nodeId: string, newData: Partial<NodeData>) => {
     setNodes((nds) =>
@@ -474,6 +527,30 @@ const BlueprintCreatorInner: React.FC<BlueprintCreatorProps> = ({ onSave, onCanc
       setEdges(flowEdges);
     }
   }, [existingBlueprint, loadedExample, setNodes, setEdges]);
+  
+  // Set appropriate zoom level for mobile devices
+  useEffect(() => {
+    const setInitialZoom = () => {
+      const isMobile = window.innerWidth < 640; // sm breakpoint
+      if (isMobile && nodes.length === 0) {
+        // Start with a zoomed-out view on mobile so nodes appear at reasonable size
+        setTimeout(() => {
+          fitView({ 
+            padding: 0.2, 
+            duration: 0,
+            minZoom: 0.3,
+            maxZoom: 0.5 
+          });
+        }, 100);
+      }
+    };
+    
+    setInitialZoom();
+    
+    // Also handle window resize
+    window.addEventListener('resize', setInitialZoom);
+    return () => window.removeEventListener('resize', setInitialZoom);
+  }, [fitView, nodes.length]);
 
   // Restore canvas from cache when returning from report page
   useEffect(() => {
@@ -836,12 +913,15 @@ const BlueprintCreatorInner: React.FC<BlueprintCreatorProps> = ({ onSave, onCanc
   return (
     <div className="h-screen flex flex-col bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b p-4 shadow-sm">
+      <div className="bg-white border-b p-2 sm:p-4 shadow-sm relative">
         <div className="flex justify-between items-center">
-          <div className="flex space-x-4 items-center">
-            <h2 className="text-xl font-bold text-gray-900">
-              {existingBlueprint ? '✏️ Edit Blueprint' : 'Agent Visualiser'}
-            </h2>
+          {/* Left side - Title */}
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+            {existingBlueprint ? '✏️ Edit' : 'Agent Visualiser'}
+          </h2>
+          
+          {/* Desktop Menu - Hidden on mobile */}
+          <div className="hidden sm:flex space-x-2 items-center">
             {onViewBlueprints && (
               <button
                 onClick={onViewBlueprints}
@@ -860,16 +940,14 @@ const BlueprintCreatorInner: React.FC<BlueprintCreatorProps> = ({ onSave, onCanc
               }`}
               title={nodes.length === 0 ? 'Add nodes to the canvas first' : 'Generate report from canvas'}
             >
-              📊 Report Generator
+              📊 Report
             </button>
-          </div>
-          <div className="flex space-x-2 items-center">
             <button 
               onClick={handleImportClick}
               className="px-4 py-2 text-green-600 bg-green-50 rounded hover:bg-green-100 transition-colors flex items-center space-x-2"
             >
               <span>📂</span>
-              <span>Import JSON</span>
+              <span>Import</span>
             </button>
             <div className="relative">
               <button 
@@ -917,14 +995,197 @@ const BlueprintCreatorInner: React.FC<BlueprintCreatorProps> = ({ onSave, onCanc
               Clear Canvas
             </button>
           </div>
+          
+          {/* Mobile Hamburger Menu */}
+          <button
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            className="sm:hidden p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded min-h-[44px] min-w-[44px] flex items-center justify-center"
+            aria-label="Menu"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
         </div>
+        
+        {/* Mobile Menu Dropdown */}
+        {showMobileMenu && (
+          <>
+            <div 
+              className="fixed inset-0 bg-black bg-opacity-25 z-40 sm:hidden"
+              onClick={() => setShowMobileMenu(false)}
+            />
+            <div className="fixed top-14 right-2 bg-white border rounded-lg shadow-xl z-50 w-64 sm:hidden max-h-[calc(100vh-80px)] overflow-y-auto">
+              <div className="py-2">
+                {onViewBlueprints && (
+                  <button
+                    onClick={() => {
+                      onViewBlueprints();
+                      setShowMobileMenu(false);
+                    }}
+                    className="w-full text-left px-4 py-3 text-blue-600 hover:bg-blue-50 flex items-center space-x-3 min-h-[44px]"
+                  >
+                    <span className="text-xl">📁</span>
+                    <span className="font-medium">View Examples</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => {
+                    handleReportClick();
+                    setShowMobileMenu(false);
+                  }}
+                  disabled={nodes.length === 0}
+                  className={`w-full text-left px-4 py-3 flex items-center space-x-3 min-h-[44px] ${
+                    nodes.length === 0
+                      ? 'text-gray-400 bg-gray-50 cursor-not-allowed'
+                      : 'text-purple-600 hover:bg-purple-50'
+                  }`}
+                >
+                  <span className="text-xl">📊</span>
+                  <span className="font-medium">Generate Report</span>
+                </button>
+                <button
+                  onClick={() => {
+                    handleImportClick();
+                    setShowMobileMenu(false);
+                  }}
+                  className="w-full text-left px-4 py-3 text-green-600 hover:bg-green-50 flex items-center space-x-3 min-h-[44px]"
+                >
+                  <span className="text-xl">📂</span>
+                  <span className="font-medium">Import JSON</span>
+                </button>
+                <button
+                  onClick={() => {
+                    exportToImage('png');
+                    setShowMobileMenu(false);
+                  }}
+                  disabled={isExporting}
+                  className="w-full text-left px-4 py-3 text-blue-600 hover:bg-blue-50 flex items-center space-x-3 min-h-[44px]"
+                >
+                  <span className="text-xl">🖼️</span>
+                  <span className="font-medium">Export as PNG</span>
+                </button>
+                <button
+                  onClick={() => {
+                    exportToImage('jpg');
+                    setShowMobileMenu(false);
+                  }}
+                  disabled={isExporting}
+                  className="w-full text-left px-4 py-3 text-blue-600 hover:bg-blue-50 flex items-center space-x-3 min-h-[44px]"
+                >
+                  <span className="text-xl">🖼️</span>
+                  <span className="font-medium">Export as JPG</span>
+                </button>
+                <button
+                  onClick={() => {
+                    exportToJSON();
+                    setShowMobileMenu(false);
+                  }}
+                  className="w-full text-left px-4 py-3 text-blue-600 hover:bg-blue-50 flex items-center space-x-3 min-h-[44px]"
+                >
+                  <span className="text-xl">📄</span>
+                  <span className="font-medium">Export as JSON</span>
+                </button>
+                <button
+                  onClick={() => {
+                    handleClearCanvas();
+                    setShowMobileMenu(false);
+                  }}
+                  className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 flex items-center space-x-3 min-h-[44px] border-t"
+                >
+                  <span className="text-xl">🗑️</span>
+                  <span className="font-medium">Clear Canvas</span>
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
-      <div className="flex-1 flex">
-        {/* Sidebar */}
-        <div className="w-72 bg-white border-r shadow-sm overflow-y-auto">
-          <div className="p-4">
+      <div className="flex-1 flex flex-col lg:flex-row">
+        {/* Sidebar - Horizontal tabs on mobile, vertical on desktop */}
+        <div className="w-full lg:w-72 bg-white border-b lg:border-r lg:border-b-0 shadow-sm overflow-y-auto">
+          {/* Mobile: Horizontal tabs */}
+          <div className="lg:hidden flex border-b">
+            <button
+              onClick={() => toggleSection('agents')}
+              className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                sectionsExpanded.agents
+                  ? 'text-blue-600 bg-blue-50 border-b-2 border-blue-600'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              }`}
+            >
+              🤖 Agents
+            </button>
+            <button
+              onClick={() => toggleSection('tools')}
+              className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                sectionsExpanded.tools
+                  ? 'text-green-600 bg-green-50 border-b-2 border-green-600'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              }`}
+            >
+              🛠️ Tools
+            </button>
+            <button
+              onClick={() => toggleSection('gates')}
+              className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                sectionsExpanded.gates
+                  ? 'text-purple-600 bg-purple-50 border-b-2 border-purple-600'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              }`}
+            >
+              🚪 Gates
+            </button>
+          </div>
+
+          {/* Mobile: Content area below tabs */}
+          <div className="lg:hidden p-3 max-h-[40vh] overflow-y-auto">
+            {sectionsExpanded.agents && (
+              <div className="grid grid-cols-2 gap-2">
+                {['Processor', 'Analyzer', 'Responder', 'Classifier', 'Router'].map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => addAgentNode(type)}
+                    className="text-left px-3 py-2 text-sm bg-blue-50 hover:bg-blue-100 rounded border-l-4 border-blue-400 transition-colors min-h-[44px]"
+                  >
+                    <span className="font-medium">{type}</span>
+                  </button>
+                ))}
+              </div>
+            )}
             
+            {sectionsExpanded.tools && (
+              <div className="grid grid-cols-2 gap-2">
+                {['REST API', 'Database', 'Email', 'Graph API', 'ServiceNow', 'File System'].map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => addToolNode(type)}
+                    className="text-left px-3 py-2 text-sm bg-green-50 hover:bg-green-100 rounded border-l-4 border-green-400 transition-colors min-h-[44px]"
+                  >
+                    <span className="font-medium">{type}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+            
+            {sectionsExpanded.gates && (
+              <div className="grid grid-cols-2 gap-2">
+                {['Condition', 'Approval', 'Merge', 'Split'].map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => addGateNode(type)}
+                    className="text-left px-3 py-2 text-sm bg-purple-50 hover:bg-purple-100 rounded border-l-4 border-purple-400 transition-colors min-h-[44px]"
+                  >
+                    <span className="font-medium">{type}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Desktop: Original vertical layout */}
+          <div className="hidden lg:block p-4">
             {/* Agents Section */}
             <div className="mb-6">
               <h4 
@@ -1029,6 +1290,15 @@ const BlueprintCreatorInner: React.FC<BlueprintCreatorProps> = ({ onSave, onCanc
             fitView
             snapToGrid
             snapGrid={[16, 16]}
+            // Mobile touch support
+            panOnScroll={true}
+            panOnDrag={true}
+            zoomOnScroll={true}
+            zoomOnPinch={true}
+            zoomOnDoubleClick={true}
+            preventScrolling={true}
+            minZoom={0.1}
+            maxZoom={4}
           >
             <Background color="#f1f5f9" gap={16} />
             <Controls />
@@ -1042,12 +1312,31 @@ const BlueprintCreatorInner: React.FC<BlueprintCreatorProps> = ({ onSave, onCanc
               className="!bg-white !border-gray-300"
             />
             
-            {/* Help Panel */}
-            <Panel position="top-right">
-              <div className="bg-white p-3 rounded-lg shadow-lg border text-sm max-w-xs">
-                <div className="flex items-center mb-2">
-                  <span className="text-lg mr-2">📊</span>
-                  <span className="font-medium">Workflow Stats</span>
+            {/* Workflow Stats Panel - Bottom right, smaller button */}
+            <Panel position="bottom-right">
+              {/* Mobile: Collapsible button - smaller size */}
+              <button
+                onClick={() => setShowWorkflowStats(!showWorkflowStats)}
+                className="lg:hidden bg-white p-1.5 rounded-lg shadow-lg border flex items-center justify-center min-h-[32px] min-w-[32px]"
+                aria-label="Toggle stats"
+              >
+                <span className="text-sm">{showWorkflowStats ? '✕' : '📊'}</span>
+              </button>
+              
+              {/* Stats panel - Always visible on desktop, toggleable on mobile */}
+              <div className={`bg-white p-3 rounded-lg shadow-lg border text-sm max-w-xs ${showWorkflowStats ? 'block' : 'hidden lg:block'}`}>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center">
+                    <span className="text-lg mr-2">📊</span>
+                    <span className="font-medium">Workflow Stats</span>
+                  </div>
+                  <button
+                    onClick={() => setShowWorkflowStats(false)}
+                    className="lg:hidden text-gray-400 hover:text-gray-600 p-1"
+                    aria-label="Close stats"
+                  >
+                    ✕
+                  </button>
                 </div>
                 <div className="space-y-1 text-xs text-gray-600">
                   <div>Agents: {nodes.filter(n => (n.data as unknown as NodeData).type === 'agent').length}</div>
@@ -1057,15 +1346,15 @@ const BlueprintCreatorInner: React.FC<BlueprintCreatorProps> = ({ onSave, onCanc
                 </div>
               </div>
             </Panel>
+            
+            {/* Click outside to close export menu */}
+            {showExportMenu && (
+              <div 
+                className="fixed inset-0 z-5" 
+                onClick={() => setShowExportMenu(false)}
+              />
+            )}
           </ReactFlow>
-          
-          {/* Click outside to close export menu */}
-          {showExportMenu && (
-            <div 
-              className="fixed inset-0 z-5" 
-              onClick={() => setShowExportMenu(false)}
-            />
-          )}
         </div>
       </div>
 

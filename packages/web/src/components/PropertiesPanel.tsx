@@ -287,62 +287,72 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   };
 
   return (
-    <div className="fixed right-0 top-0 h-full w-80 bg-white shadow-xl border-l z-50 overflow-y-auto">
-      <div className="p-4 border-b bg-gray-50">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">
-            {selectedEdge ? '🔗 Connecting Line' : 
-             formData.type === 'agent' ? '🤖 Agent' : 
-             formData.type === 'tool' ? '🛠️ Tool' : '🚪 Gate'} Properties
-          </h3>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-xl"
-          >
-            ×
-          </button>
+    <>
+      {/* Backdrop overlay - full screen on mobile */}
+      <div 
+        className="fixed inset-0 bg-black bg-opacity-25 z-40 lg:hidden"
+        onClick={onClose}
+      />
+      
+      {/* Properties Panel - Bottom sheet on mobile, sidebar on desktop */}
+      <div className="fixed bottom-0 left-0 right-0 lg:right-0 lg:left-auto lg:top-0 lg:bottom-auto h-[85vh] lg:h-full w-full lg:w-80 bg-white shadow-xl border-t lg:border-t-0 lg:border-l z-50 overflow-y-auto rounded-t-2xl lg:rounded-none">
+        <div className="p-3 sm:p-4 border-b bg-gray-50 sticky top-0 z-10">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+              {selectedEdge ? '🔗 Connecting Line' : 
+               formData.type === 'agent' ? '🤖 Agent' : 
+               formData.type === 'tool' ? '🛠️ Tool' : '🚪 Gate'} Properties
+            </h3>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 text-2xl min-h-[44px] min-w-[44px] flex items-center justify-center -mr-2"
+              aria-label="Close"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+
+        <div className="p-3 sm:p-4">
+          {selectedEdge && renderEdgeProperties()}
+          {selectedNode && formData.type === 'agent' && renderAgentProperties()}
+          {selectedNode && formData.type === 'tool' && renderToolProperties()}
+          {selectedNode && formData.type === 'gate' && renderGateProperties()}
+
+          <div className="flex flex-col sm:flex-row gap-2 mt-6 pt-4 border-t">
+            <button
+              onClick={onClose}
+              className="flex-1 px-4 py-3 sm:py-2 text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition min-h-[44px]"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              className="flex-1 px-4 py-3 sm:py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition min-h-[44px]"
+            >
+              Save Changes
+            </button>
+            {selectedNode && onDeleteNode && (
+              <button
+                onClick={handleDeleteNode}
+                className="px-4 py-3 sm:py-2 bg-red-600 text-white rounded hover:bg-red-700 transition min-h-[44px] sm:w-auto"
+                title="Delete this node"
+              >
+                🗑️ Delete
+              </button>
+            )}
+            {selectedEdge && onDeleteEdge && (
+              <button
+                onClick={handleDeleteEdge}
+                className="px-4 py-3 sm:py-2 bg-red-600 text-white rounded hover:bg-red-700 transition min-h-[44px] sm:w-auto"
+                title="Delete this connection"
+              >
+                🗑️ Delete
+              </button>
+            )}
+          </div>
         </div>
       </div>
-
-      <div className="p-4">
-        {selectedEdge && renderEdgeProperties()}
-        {selectedNode && formData.type === 'agent' && renderAgentProperties()}
-        {selectedNode && formData.type === 'tool' && renderToolProperties()}
-        {selectedNode && formData.type === 'gate' && renderGateProperties()}
-
-        <div className="flex space-x-2 mt-6 pt-4 border-t">
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-2 text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-          >
-            Save
-          </button>
-          {selectedNode && onDeleteNode && (
-            <button
-              onClick={handleDeleteNode}
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
-              title="Delete this node"
-            >
-              🗑️
-            </button>
-          )}
-          {selectedEdge && onDeleteEdge && (
-            <button
-              onClick={handleDeleteEdge}
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
-              title="Delete this connection"
-            >
-              🗑️
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
+    </>
   );
 };
