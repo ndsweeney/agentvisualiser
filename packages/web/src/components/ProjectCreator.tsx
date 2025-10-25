@@ -1276,7 +1276,7 @@ const BlueprintCreatorInner: React.FC<BlueprintCreatorProps> = ({ onSave, onCanc
         </div>
 
         {/* Main Canvas */}
-        <div className="flex-1 relative" ref={reactFlowWrapper}>
+        <div className="flex-1 relative pb-20 sm:pb-0" ref={reactFlowWrapper}>
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -1301,7 +1301,7 @@ const BlueprintCreatorInner: React.FC<BlueprintCreatorProps> = ({ onSave, onCanc
             maxZoom={4}
           >
             <Background color="#f1f5f9" gap={16} />
-            <Controls />
+            <Controls className="!bottom-16 sm:!bottom-4" />
             <MiniMap 
               nodeColor={(node) => {
                 const data = node.data as unknown as NodeData;
@@ -1309,11 +1309,11 @@ const BlueprintCreatorInner: React.FC<BlueprintCreatorProps> = ({ onSave, onCanc
                 if (data.type === 'tool') return '#10b981';
                 return '#8b5cf6';
               }}
-              className="!bg-white !border-gray-300"
+              className="!bg-white !border-gray-300 !bottom-16 sm:!bottom-4"
             />
             
-            {/* Workflow Stats Panel - Bottom right, smaller button */}
-            <Panel position="bottom-right">
+            {/* Workflow Stats Panel - Bottom right with proper spacing */}
+            <Panel position="bottom-right" className="!bottom-16 sm:!bottom-4 !right-2 sm:!right-4">
               {/* Mobile: Collapsible button - smaller size */}
               <button
                 onClick={() => setShowWorkflowStats(!showWorkflowStats)}
