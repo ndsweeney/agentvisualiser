@@ -8,6 +8,7 @@ import {
   updateBlueprint, 
   deleteBlueprint as deleteBlueprintFromStorage 
 } from '../src/utils/blueprintStorage';
+import { WelcomeModal } from '../src/components/WelcomeModal';
 
 // Dynamically import the BlueprintCreator to avoid SSR issues
 const BlueprintCreator = dynamic(() => import('../src/components/ProjectCreator').then(mod => ({ default: mod.BlueprintCreator })), {
@@ -113,6 +114,9 @@ export default function Home() {
         <meta name="description" content="Create intelligent agent blueprints visually" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
+
+      {/* Welcome Modal - Shows on first visit */}
+      <WelcomeModal />
 
       <div className="h-screen flex flex-col bg-gray-100">
         {/* Blueprints Modal */}
